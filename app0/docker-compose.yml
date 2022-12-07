@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+  lbapp1:
+    image: haproxy
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./app1:/usr/local/etc/haproxy
+
+  lbapp2:
+    image: haproxy
+    ports:
+      - '5002:5002'
+    volumes:
+      - ./app2:/usr/local/etc/haproxy
+
+  app1v1:
+    image: iapp1
+    container_name: capp1v1
+    hostname: hostapp1v1
+    ports:
+      - '2001:2001'
+    environment:
+      - PORT=2001
+      - EXTERNAL_APP=lbapp2:5002
+      - APPID=app1v1
+
+  app1v2:
+    image: iapp1
+    container_name: capp1v2
+    hostname: hostapp1v2
+    ports:
+      - '2002:2002'
+    environment:
+      - PORT=2002
+      - EXTERNAL_APP=lbapp2:5002
+      - APPID=app1v2
+
+  app2v1:
+    image: iapp2
+    container_name: capp2v1
+    hostname: hostapp2v1
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - EXTERNAL_APP=lbapp1:5000
+      - APPID=app2v1
+
+  app2v2:
+    image: iapp2
+    container_name: capp2v2
+    hostname: hostapp2v2
+    ports:
+      - '3002:3002'
+    environment:
+      - PORT=3002
+      - EXTERNAL_APP=lbapp1:5000
+      - APPID=app2v2
+
+  singleApp:
+    image: iapp1
+    container_name: aloneapp1
+    hostname: aloneapp1
+    ports:
+      - '4000:4000'
+    environment:
+      - PORT=4000
+      - EXTERNAL_APP=lbapp2:5002
+      - APPID=singleApp
